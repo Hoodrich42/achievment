@@ -1,4 +1,5 @@
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
+from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView
@@ -23,7 +24,6 @@ class RegisterUser(CreateView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Регистрация'
-        print(context)
         return context
 
     def form_valid(self, form):
@@ -32,3 +32,22 @@ class RegisterUser(CreateView):
         subscription.save()
         login(self.request, user)
         return redirect('main')
+
+
+class LoginUser(LoginView):
+    form_class = LoginUserForm
+    template_name = 'purpose/register.html'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Вход'
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy('main')
+
+
+def logout_user(request):
+    logout(request)
+    return redirect('login')
+
