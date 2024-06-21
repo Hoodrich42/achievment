@@ -1,11 +1,19 @@
-from django.conf import settings
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
+from django.urls import reverse
 
 
-class Subscription(models.Model):
-    from_user = models.OneToOneField('auth.User', on_delete=models.CASCADE, unique=True)
-    to_user = models.ManyToManyField('auth.User', blank=True, related_name='sub')
+class Profile(models.Model):
+    user = models.OneToOneField('auth.User', on_delete=models.CASCADE, unique=True)
+    profile_image = models.ImageField(upload_to='profile_images', blank=True, null=True, verbose_name='Изображение')
+    subscribe_to_user = models.ManyToManyField('auth.User', blank=True, related_name='sub')
+
+    def get_absolute_url(self):
+        return reverse('profile', kwargs={'pk': self.user.id})
+
+
+
+
 
 
 
