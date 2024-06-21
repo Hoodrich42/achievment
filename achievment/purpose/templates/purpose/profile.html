@@ -3,15 +3,23 @@
 {% block content %}
 
 <div class="container">
-    <div class="row">
-        <div class="col-1 w-auto">
-            <div class="profile-image">
-                <img src="{{ profile.profile_image.url }}" alt="avatar">
-            </div>
+    <div class="profile-info">
+        <div class="profile-image">
+            {% if profile.profile_image %}
+            <img src="{{ profile.profile_image.url }}" alt="avatar">
+            {% else %}
+            <img src="/media/profile_images/empty.png" alt="avatar">
+            {% endif %}
         </div>
-        <div class="col-2">
-            <h3>{{ request.user.username }}</h3>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form }}
+            <button type="submit">Загрузить фото</button>
+        </form>
+        <div class="names text-center">
+            <h5>{{profile.user.first_name}} {{profile.user.last_name}}</h5>
         </div>
+
     </div>
 </div>
 

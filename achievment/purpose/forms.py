@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from .models import *
 
 
 class RegisterUserForm(forms.ModelForm):
@@ -22,3 +23,11 @@ class LoginUserForm(AuthenticationForm):
 
     class Meta:
         fields = ['username', 'password']
+
+
+class ProfilePhoto(forms.ModelForm):
+    profile_image = forms.FileField(label='Photo', widget=forms.FileInput(attrs={'class': 'photo'}))
+
+    class Meta:
+        model = Profile
+        fields = ('profile_image',)
