@@ -1,3 +1,5 @@
+import os
+
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
@@ -9,6 +11,7 @@ from django.views.generic import CreateView, TemplateView, DetailView
 from .utils import *
 from .forms import *
 from .models import *
+from achievment.settings import BASE_DIR
 
 
 class Main(TemplateView):
@@ -67,14 +70,15 @@ class UserProfile(DetailView, CreateView):
 
     def form_valid(self, form):
         fp = Profile.objects.get(user_id=self.request.user.id)
-        print(self.request.FILES['profile_image'], '--------------------')
+        if fp.profile_image:
+            file_path = str(BASE_DIR) + fp.profile_image.url
+            print(file_path, 'file_pathfile_pathfile_pathfile_pathfile_path')
+            os.remove(file_path)
         fp.profile_image = self.request.FILES['profile_image']
         fp.save()
         return redirect('profile', username_slug=fp.slug)
 
     def get_queryset(self):
-        print(self.kwargs['username_slug'])
-        #user = User.objects.get(username=self.kwargs['username_slug'])
         return Profile.objects.filter(slug=self.kwargs['username_slug'])
 
     def get_context_data(self, *, object_list=None, **kwargs):

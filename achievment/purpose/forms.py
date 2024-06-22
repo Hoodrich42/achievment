@@ -26,7 +26,7 @@ class LoginUserForm(AuthenticationForm):
 
 
 class ProfilePhoto(forms.ModelForm):
-    profile_image = forms.FileField(label='Photo', widget=forms.FileInput(attrs={'class': 'photo'}))
+    profile_image = forms.ImageField(label='', widget=forms.FileInput(attrs={'class': "form-control", 'type': "file", 'id': "formFile"}))
 
     class Meta:
         model = Profile

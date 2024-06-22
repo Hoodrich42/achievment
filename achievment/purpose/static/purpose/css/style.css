@@ -25,3 +25,14 @@
     width: 250px;
     padding: 10px 0px;
 }
+
+.photo-button {
+    border: none;
+    border-radius: 50%;
+    background-color: transparent;
+    padding: 0;
+}
+
+.profile-image:hover {
+    opacity: 0.8;
+}

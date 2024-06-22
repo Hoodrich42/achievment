@@ -2,20 +2,39 @@
 
 {% block content %}
 
-<div class="container">
+<div class="container mt-5">
     <div class="profile-info">
-        <div class="profile-image">
-            {% if profile.profile_image %}
-            <img src="{{ profile.profile_image.url }}" alt="avatar">
-            {% else %}
-            <img src="/media/profile_images/empty.png" alt="avatar">
-            {% endif %}
+        <button class="photo-button" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            <div class="profile-image">
+                {% if profile.profile_image %}
+                <img src="{{ profile.profile_image.url }}" alt="avatar">
+                {% else %}
+                <img src="/media/profile_images/empty.png" alt="avatar">
+                {% endif %}
+            </div>
+        </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Фото профиля</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form }}
+                    <div class="modal-footer mt-3">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Загрузить фото</button>
+                    </div>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form }}
-            <button type="submit">Загрузить фото</button>
-        </form>
         <div class="names text-center">
             <h5>{{profile.user.first_name}} {{profile.user.last_name}}</h5>
         </div>
