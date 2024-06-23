@@ -26,8 +26,17 @@ class LoginUserForm(AuthenticationForm):
 
 
 class ProfilePhoto(forms.ModelForm):
-    profile_image = forms.ImageField(label='', widget=forms.FileInput(attrs={'class': "form-control", 'type': "file", 'id': "formFile"}))
+    profile_image = forms.ImageField(label='', required=False, widget=forms.FileInput(attrs={'class': "form-control", 'type': "file", 'id': "formFile"}))
 
     class Meta:
         model = Profile
         fields = ('profile_image',)
+
+
+class SubscribeForm(forms.ModelForm):
+    subscribe_btn = forms.BooleanField(required=False, initial=True)
+
+    class Meta:
+        model = Profile
+        fields = ('subscribe_btn',)
+

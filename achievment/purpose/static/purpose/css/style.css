@@ -8,6 +8,10 @@
     box-shadow: none;
 }
 
+.profile-info {
+    border-radius: 30px;
+}
+
 .profile-image {
     height: 250px;
     width: 250px;
@@ -35,4 +39,8 @@
 
 .profile-image:hover {
     opacity: 0.8;
+}
+
+.stranger:hover {
+    opacity: 1;
 }

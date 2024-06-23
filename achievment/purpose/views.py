@@ -36,11 +36,14 @@ class RegisterUser(CreateView):
         return context
 
     def form_valid(self, form):
-        user = form.save()
-        subscription = Profile(user=user, slug=user.username)
-        subscription.save()
-        login(self.request, user)
-        return redirect('main')
+        if form.is_valid():
+            new_user = form.save(commit=False)
+            new_user.set_password(form.cleaned_data['password'])
+            new_user.save()
+            subscription = Profile(user=new_user, slug=new_user.username)
+            subscription.save()
+            login(self.request, new_user)
+            return redirect('main')
 
 
 class LoginUser(LoginView):
@@ -68,15 +71,42 @@ class UserProfile(DetailView, CreateView):
     slug_url_kwarg = 'username_slug'
     success_url = reverse_lazy('profile')
 
+    def post(self, request, *args, **kwargs):
+        which_form_is_submiting = request.POST['which_form_is_it']
+        if which_form_is_submiting == 'profile_photo':
+            form = ProfilePhoto(request.POST)
+        else:
+            form = SubscribeForm(request.POST)
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
     def form_valid(self, form):
-        fp = Profile.objects.get(user_id=self.request.user.id)
-        if fp.profile_image:
-            file_path = str(BASE_DIR) + fp.profile_image.url
-            print(file_path, 'file_pathfile_pathfile_pathfile_pathfile_path')
-            os.remove(file_path)
-        fp.profile_image = self.request.FILES['profile_image']
-        fp.save()
-        return redirect('profile', username_slug=fp.slug)
+        which_form_is_submiting = self.request.POST["which_form_is_it"]
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        print(which_form_is_submiting, '!!!!!!!!!!!!!!!!!!!!')
+        if which_form_is_submiting == 'profile_photo':
+            if profile.profile_image:
+                file_path = str(BASE_DIR) + profile.profile_image.url
+                print(file_path, 'file_pathfile_pathfile_pathfile_pathfile_path')
+                os.remove(file_path)
+            profile.profile_image = self.request.FILES['profile_image']
+            profile.save()
+            return redirect('profile', username_slug=profile.slug)
+
+        if which_form_is_submiting == 'subscribe':
+            user_profile = Profile.objects.get(slug=self.kwargs['username_slug'])
+            profile.subscribe_to_user.add(user_profile.user.id)
+            user_profile.subscribe_from_user.add(profile.user.id)
+            return redirect('profile', username_slug=user_profile.slug)
+
+        if which_form_is_submiting == 'unsubscribe':
+            user_profile = Profile.objects.get(slug=self.kwargs['username_slug'])
+            profile.subscribe_to_user.remove(user_profile.user.id)
+            user_profile.subscribe_from_user.remove(profile.user.id)
+            return redirect('profile', username_slug=user_profile.slug)
+
 
     def get_queryset(self):
         return Profile.objects.filter(slug=self.kwargs['username_slug'])
@@ -84,8 +114,12 @@ class UserProfile(DetailView, CreateView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Профиль'
-        context['profile'] = Profile.objects.get(slug=self.kwargs['username_slug'])
+        context['profile'] = Profile.objects.get(user_id=self.request.user.id)
+        context['user_profile'] = Profile.objects.get(slug=self.kwargs['username_slug'])
+        context['sub_form'] = SubscribeForm()
+        context['unsub_form'] = SubscribeForm()
         context['file'] = self.request.FILES
+        context['sub_or_not'] = context['profile'].sub_or_not(context['user_profile'].user.id)
         return context
 
 def logout_user(request):

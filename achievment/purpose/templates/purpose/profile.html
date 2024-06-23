@@ -2,18 +2,30 @@
 
 {% block content %}
 
-<div class="container mt-5">
-    <div class="profile-info">
-        <button class="photo-button" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
+<div class="container mt-3 p-0">
+    <div class="profile-info bg-light p-2 row justify-content-start">
+        {% if request.user.username == user_profile.user.username %}
+        <button class="photo-button col-3 w-auto" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
             <div class="profile-image">
-                {% if profile.profile_image %}
-                <img src="{{ profile.profile_image.url }}" alt="avatar">
+                {% if user_profile.profile_image %}
+                <img src="{{ user_profile.profile_image.url }}" alt="avatar">
                 {% else %}
                 <img src="/media/profile_images/empty.png" alt="avatar">
                 {% endif %}
             </div>
         </button>
+        {% else %}
+        <div class="photo-button col-3 w-auto">
+            <div class="profile-image stranger">
+                {% if user_profile.profile_image %}
+                <img src="{{ user_profile.profile_image.url }}" alt="avatar">
+                {% else %}
+                <img src="/media/profile_images/empty.png" alt="avatar">
+                {% endif %}
+            </div>
+        </div>
 
+        {% endif %}
         <!-- Modal -->
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
           <div class="modal-dialog">
@@ -30,13 +42,43 @@
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Загрузить фото</button>
                     </div>
+                    <input type="hidden" name="which_form_is_it" value="profile_photo">
                 </form>
               </div>
             </div>
           </div>
         </div>
-        <div class="names text-center">
-            <h5>{{profile.user.first_name}} {{profile.user.last_name}}</h5>
+        <div class="names text-center col-2 ps-1 ms-2">
+            <h3>{{user_profile.user.first_name}} {{user_profile.user.last_name}}</h3>
+            <div class="subs row justify-content-evenly">
+                <div class="sub_from col-2 w-auto">
+                    <p class="p-0 m-0">Подписан на</p>
+                    {{ user_profile.get_subscribtion_count }}
+                </div>
+                <div class="sub_to col-2 w-auto">
+                    <p class="p-0 m-0">Подписчиков</p>
+                    {{ user_profile.get_subscribers_count }}
+                </div>
+            </div>
+            {% if user_profile.user.id != request.user.id %}
+                {% if sub_or_not %}
+                <div class="subscribe_action">
+                    <form method="post" class="needs-validation">
+                        {% csrf_token %}
+                        <button class="btn btn-primary" type="submit">Подписаться</button>
+                        <input type="hidden" name="which_form_is_it" value="subscribe">
+                    </form>
+                </div>
+                {% else %}
+                <div class="subscribe_action">
+                    <form method="post" class="needs-validation">
+                        {% csrf_token %}
+                        <button class="btn btn-primary" type="submit">Отписаться</button>
+                        <input type="hidden" name="which_form_is_it" value="unsubscribe">
+                    </form>
+                </div>
+                {% endif %}
+            {% endif %}
         </div>
 
     </div>
